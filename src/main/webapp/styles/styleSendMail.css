@@ -1,0 +1,7 @@
+div>input[type='button'] {
+	text-align: right;
+	background-color: #484848;
+	color: white;
+	margin-left: 25em;
+	cursor: pointer;	
+}

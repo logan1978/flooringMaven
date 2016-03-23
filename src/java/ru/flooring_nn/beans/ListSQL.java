@@ -1,20 +1,20 @@
-package ru.floring_nn.beans;
+package ru.flooring_nn.beans;
 
-import java.util.Vector;
+import java.util.*;
 
-public class VectorSQL {
+public class ListSQL {
 	private String sql;
-	private Vector<Object> setPars = new Vector<Object>();
+	private List<Object> setPars = new ArrayList<Object>();
 	private int maxRows = Integer.MAX_VALUE;
 	private int page = 1;
 	
-	public VectorSQL(String sql, Vector<Object> setPars) {
+	public ListSQL(String sql, List<Object> setPars) {
 		// TODO Auto-generated constructor stub
 		this.sql = sql;
 		this.setPars = setPars;
 	}
 
-	public VectorSQL(String sql, Vector<Object> setPars, int maxRows, int page) {
+	public ListSQL(String sql, List<Object> setPars, int maxRows, int page) {
 		// TODO Auto-generated constructor stub
 		this.sql = sql;
 		this.setPars = setPars;
@@ -26,7 +26,7 @@ public class VectorSQL {
 		return sql;
 	}
 	
-	public Vector<Object> getSetPars() {
+	public List<Object> getSetPars() {
 		return setPars;
 	}
 	
@@ -37,4 +37,6 @@ public class VectorSQL {
 	public int getMaxRows() {
 		return maxRows;
 	}
+
 }
+

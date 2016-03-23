@@ -1,3 +1,4 @@
+<jsp:include page="top.jsp"/>
 <%@page import="java.util.*"%>
 <jsp:useBean id="commonBean" scope="session" class="ru.flooring_nn.beans.CommonBean"/>
 <%@ page language="java" contentType="text/html; charset=utf-8"
@@ -64,19 +65,19 @@ String [] coll = {catalog_pred.firstElement().get(names[2]), catalog_pred.firstE
 String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstElement().get("ID_"+names[3])};
 %>
 								<nobr>				 			
-					 				<a href="" onclick="loadCatalog(0, 0);">Каталог товаров</a>
+					 				<a href="#" onclick="loadCatalog(0, 0);">Каталог товаров</a>
 					 				<span>
 						 				<%	if(sect != null && sect[0]!=null) {%>
-						 				/<a href="" onclick="loadCatalog(<%=sect[1]%>, 1);"><%=sect[0] %></a>
+						 				/<a href="#" onclick="loadCatalog(<%=sect[1]%>, 1);"><%=sect[0] %></a>
 						 				<%} 
 						 					if(firm!=null && firm[0] != null) {%>
-						 				/<a href="" onclick="loadCatalog(<%=firm[1]%>, 2);"><%=firm[0] %></a>
+						 				/<a href="#" onclick="loadCatalog(<%=firm[1]%>, 2);"><%=firm[0] %></a>
 						 				<%} 
 						 					if(coll!=null && coll[0] != null) {%>
-						 				/<a href="" onclick="loadCatalog(<%=coll[1]%>, 3);"><%=coll[0] %></a>
+						 				/<a href="#" onclick="loadCatalog(<%=coll[1]%>, 3);"><%=coll[0] %></a>
 						 				<%} 
 						 					if(dec !=null && dec[0] != null) {%>
-						 				/<a href="" onclick="loadCatalog(<%=dec[1]%>, 4);"><%=dec[0] %></a>
+						 				/<a href="#" onclick="loadCatalog(<%=dec[1]%>, 4);"><%=dec[0] %></a>
 						 				<%} %>
 					 				</span>
 				 				</nobr>
@@ -91,7 +92,7 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 					 				<%=countRows %> <%=tov %>
 <%									}
   } else {%>
-					 				<a href="" onclick="loadCatalog(0, 0);">Каталог товаров</a>
+					 				<a href="#" onclick="loadCatalog(0, 0);">Каталог товаров</a>
 <%} %>
 				 			</h3>
 				 		</caption>
@@ -107,7 +108,7 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 										String picture = row.get("PICTURE");
 										String id = row.get("ID");%>
 										<td style='width : <%=percentWidth%>%'>
-					 					<a onclick="loadCatalog(<%=id%>, <%=level+1%>);">
+					 					<a href="#" onclick="loadCatalog(<%=id%>, <%=level+1%>);">
 					 						<div>
 					 							<img alt="<%=section%>" title="<%=section%>" src="<%=picture%>">
 					 							<br/><%=section%>
@@ -194,9 +195,9 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 			 					if(i!=page_) {
 			 						String id = pars.get("id");
 			 						if("poisk".equals(id)) {%>
-			 				&nbsp;<a href="" onclick="loadCatalog('<%=id%>',3,<%=i%>);"><%=i%></a>&nbsp;
+			 				&nbsp;<a href="#" onclick="loadCatalog('<%=id%>',3,<%=i%>);"><%=i%></a>&nbsp;
 			 						<%} else { %>
-			 				&nbsp;<a href="" onclick="loadCatalog(<%=id_parrent%>, <%=level%>, <%=i%>);"><%=i%></a>&nbsp;
+			 				&nbsp;<a href="#" onclick="loadCatalog(<%=id_parrent%>, <%=level%>, <%=i%>);"><%=i%></a>&nbsp;
 			 			<%			}
 			 					} else {%>
 			 						<span>&nbsp;<%=i%>&nbsp;</span>
@@ -207,3 +208,4 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 				 			<br/>
 			 			<%}%>
 				 	</div>
+<jsp:include page="foot.jsp"/>

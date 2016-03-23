@@ -13,7 +13,6 @@
     <script type="text/javascript" src="js/jquery-latest.min.js"></script> 
     <script type="text/javascript" src="js/jquery.cross-slide.js"></script> 
     <script type="text/javascript">
-    alert(0);
     $(document).ready(function(){
         $('#menu ul li').hover(function(){
         	$('#menu ul li').css('display','block');
@@ -37,7 +36,7 @@
         });
         
         $(function() {
-        	$('#multyPics').crossSlide({
+        	$('#test1').crossSlide({
         	sleep: 2.5,
 
         	fade: 1
@@ -71,7 +70,7 @@
 	        		var level_parent = $("#level_parent").val();
 	        		var id_parent = $("#id_parent").val();
 		        	$.ajax({
-	      			  url: "Catalog.jsp",
+	      			  url: "Catalog2.jsp",
 	    			  data: {id  : id, level : 3, page : page, poisk : poisk, level_parent : level_parent, id_parent : id_parent},
 	    			  cache: false
 	    			}).done(function( html ) {
@@ -81,7 +80,7 @@
         		return false;
         	} else {
 	        	$.ajax({
-	        			  url: "Catalog.jsp",
+	        			  url: "Catalog2.jsp",
 	        			  data: {id  : id, level : level, page : page},
 	        			  cache: false
 	        			}).done(function( html ) {
@@ -108,19 +107,21 @@
         }
         
         function setLeftCatalog(name, id, id_tek, level) {
+//        	alert($("#"+name+id+" ul").html());
         	if($("#"+name+id+" ul").html()==null) {
         		$("#catalog #"+name+id).parent().find("a").removeAttr("class");
         		$("#catalog #"+name+id+" a").attr("class","ovalBorder5");
         		$("#catalog #"+name+id).append("<ul>");
-        		$("#menu_li_"+id+" li").each(function() {
+//        		alert($("#menu_li_"+id+" li").html());
+      		$("#menu_li_"+id+" li").each(function() {
 //        			alert($(this).attr("id"));
 					var str_id = $(this).attr('id');
-					var ahref = '<a href="#" onclick="loadCatalog('+str_id+', 2);" style="font-size : 12px;">';
+					var ahref = '<a href="level0.jsp?id='+str_id+'&amp;level=2" style="font-size : 12px;">';
         			$("#catalog #"+name+id+" ul").append("<li style='margin-left: -25px;list-style-type: disc;' id='FIRMA"+str_id+"''>"+ahref+$(this).text()+"</a></li>");
         		});
         	}
 //        	alert($("#catalog  #"+name+id).parent().parent().html());
-        	loadCatalog(id_tek, level);
+//        	loadCatalog(id_tek, level);
         }
 
         function addToBasket() {
@@ -144,24 +145,17 @@
     </script> 
 
 <%
-HashMap <String, String> pars = new HashMap<String,String>(); 
-//request.setCharacterEncoding("UTF-8");
-for(Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
-	String name = (String) params.nextElement();
-	if(!"_".equals(name)) {
-		pars.put(name, request.getParameter(name)); 
-//				new String(request.getParameter(name).getBytes("ISO-8859-1"),"UTF-8"));
-//		out.println(name+"= "+pars.get(name)+"\r\n");
-	}
-	commonBean.setPars(pars);
-}
+//Connection con = commonBean.getConnection();
 commonBean.setPars(null); 
 commonBean.setLevel();
 commonBean.setPage();
-HashMap<String, Vector<HashMap<String, String>>> result = commonBean.getResult();
-Vector<HashMap<String, String>> catalog = result.get("Request_0");
-HashMap <String, String> rows = (HashMap <String, String>) catalog.lastElement();
-catalog.remove(catalog.lastElement());
+String className = "ru.flooring_nn.sql.SQLsFlooring_nn";
+String methodName = "getRequests";
+HashMap<String, List<HashMap<String, String>>> result = commonBean.getResult(className, methodName);
+List<HashMap<String, String>> catalog = result.get("Request_0");
+HashMap <String, String> rows = (HashMap <String, String>) catalog.get(catalog.size()-1);
+catalog.remove(catalog.get(catalog.size()-1));
+//String sss=catalog.get(0);
 %>
  <link href="styles/style.css" rel='stylesheet' type='text/css'>
  </head>
@@ -171,18 +165,26 @@ catalog.remove(catalog.lastElement());
 <center>    
 <ul id="menu"> 
 	<li>
-			<a href="">Главная</a>
+			<a href="index2.jsp">Главная</a>
 	</li> 
 	<li> 
 		<a href="#">Каталог товаров</a> 
 		<ul> 
-		<%for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
-			HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement()); 
+		<%for(HashMap<String, String> row : catalog) {
+//		for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+//			HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement()); 
 			String section = row.get("SECTION");
 			String picture = row.get("PICTURE");
 			String id = row.get("ID");%>
-			<li id="menu_li_<%=id%>" style="cursor: pointer"> 
-				<a onclick="loadCatalog(<%=id%>, 1);$('#menu ul li').css('display','none');" onmouseover="loadFirm(<%=id%>);"><%=section%></a> 
+			<li id="menu_li_<%=id%>" > 
+				<a href="#" onclick="loadCatalog(<%=id%>, 1);$('#menu ul li').css('display','none');" onmouseover="loadFirm(<%=id%>);"><%=section%></a> 
+<%--				<ul> 
+					<li><a href="#">Item 11</a></li> 
+					<li><a href="#">Item 12</a></li> 
+					<li><a href="#">Item 13</a></li> 
+					<li><a href="#">Item 14</a></li> 
+				</ul>
+--%>								
 			</li>						
 		<%}%>
 		</ul> 
@@ -203,7 +205,17 @@ catalog.remove(catalog.lastElement());
 	<li>
 			<div id='basketBlock'>
 				<img alt="" height='35px;' src="images/basketShop.png">
-				<jsp:include page="Basket.jsp"></jsp:include>
+				<%Basket basket = commonBean.getBasket();
+				if(basket != null && basket.getSizeBasket() > 0) {%>
+					<div id='cnt'>
+						<nobr>Всего: <%=basket.getCountBasket()%> <%=commonBean.getNormPrefix(basket.getCountBasket(), "товар") %>.</nobr>
+					</div>
+					<div id='prc'>
+						<nobr>Стоимость: <%= basket.getCommonPrice()%></nobr>
+					</div>
+				<%} else {%>
+					<div id='empty'>Корзина пуста</div>
+				<%}%> 
 			</div>
 	</li> 
 </ul> 
@@ -262,13 +274,14 @@ catalog.remove(catalog.lastElement());
 						<tr>
 							<td>
 								<ul id="catalog">
-								<%for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
-									HashMap<String, String> row = (HashMap<String, String>) elements.nextElement();
+								<%for(HashMap<String, String> row : catalog) {
+//								for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+//									HashMap<String, String> row = (HashMap<String, String>) elements.nextElement();
 									String section = row.get("SECTION");
 									String id = row.get("ID");
 									%>
 									<li id='SECTION<%=id%>'> 
-										<a href="#" onclick="loadCatalog(<%=id%>, 1);">
+										<a href="level0.jsp?id=<%=id%>&amp;level=1">
 											<%=section%>
 										</a>
 									</li>						
@@ -332,20 +345,5 @@ catalog.remove(catalog.lastElement());
 						<tr>
 							 <td colspan="2"  style="width: 75%;vertical-align: top;text-align: center;">
 							 	<div id="loadBlock" style="vertical-align: top;">
-								 	<div align="center" id="multyPics">
+								 	<div align="center" id="test1">
 								 	</div><br/>
-<%
-commonBean.setPars(pars);
-%>								 	
-									<jsp:include page="Catalog.jsp"/>								 	
-							 	</div>
-					 			<br/>
-							 </td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-</div>
-</body>
-</html>

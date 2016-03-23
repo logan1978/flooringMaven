@@ -13,7 +13,6 @@
     <script type="text/javascript" src="js/jquery-latest.min.js"></script> 
     <script type="text/javascript" src="js/jquery.cross-slide.js"></script> 
     <script type="text/javascript">
-    alert(0);
     $(document).ready(function(){
         $('#menu ul li').hover(function(){
         	$('#menu ul li').css('display','block');
@@ -37,7 +36,7 @@
         });
         
         $(function() {
-        	$('#multyPics').crossSlide({
+        	$('#test1').crossSlide({
         	sleep: 2.5,
 
         	fade: 1
@@ -144,17 +143,7 @@
     </script> 
 
 <%
-HashMap <String, String> pars = new HashMap<String,String>(); 
-//request.setCharacterEncoding("UTF-8");
-for(Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
-	String name = (String) params.nextElement();
-	if(!"_".equals(name)) {
-		pars.put(name, request.getParameter(name)); 
-//				new String(request.getParameter(name).getBytes("ISO-8859-1"),"UTF-8"));
-//		out.println(name+"= "+pars.get(name)+"\r\n");
-	}
-	commonBean.setPars(pars);
-}
+//Connection con = commonBean.getConnection();
 commonBean.setPars(null); 
 commonBean.setLevel();
 commonBean.setPage();
@@ -162,6 +151,7 @@ HashMap<String, Vector<HashMap<String, String>>> result = commonBean.getResult()
 Vector<HashMap<String, String>> catalog = result.get("Request_0");
 HashMap <String, String> rows = (HashMap <String, String>) catalog.lastElement();
 catalog.remove(catalog.lastElement());
+//String sss=catalog.get(0);
 %>
  <link href="styles/style.css" rel='stylesheet' type='text/css'>
  </head>
@@ -181,8 +171,15 @@ catalog.remove(catalog.lastElement());
 			String section = row.get("SECTION");
 			String picture = row.get("PICTURE");
 			String id = row.get("ID");%>
-			<li id="menu_li_<%=id%>" style="cursor: pointer"> 
-				<a onclick="loadCatalog(<%=id%>, 1);$('#menu ul li').css('display','none');" onmouseover="loadFirm(<%=id%>);"><%=section%></a> 
+			<li id="menu_li_<%=id%>" > 
+				<a href="#" onclick="loadCatalog(<%=id%>, 1);$('#menu ul li').css('display','none');" onmouseover="loadFirm(<%=id%>);"><%=section%></a> 
+<%--				<ul> 
+					<li><a href="#">Item 11</a></li> 
+					<li><a href="#">Item 12</a></li> 
+					<li><a href="#">Item 13</a></li> 
+					<li><a href="#">Item 14</a></li> 
+				</ul>
+--%>								
 			</li>						
 		<%}%>
 		</ul> 
@@ -203,7 +200,17 @@ catalog.remove(catalog.lastElement());
 	<li>
 			<div id='basketBlock'>
 				<img alt="" height='35px;' src="images/basketShop.png">
-				<jsp:include page="Basket.jsp"></jsp:include>
+				<%Basket basket = commonBean.getBasket();
+				if(basket != null && basket.getSizeBasket() > 0) {%>
+					<div id='cnt'>
+						<nobr>Всего: <%=basket.getCountBasket()%> <%=commonBean.getNormPrefix(basket.getCountBasket(), "товар") %>.</nobr>
+					</div>
+					<div id='prc'>
+						<nobr>Стоимость: <%= basket.getCommonPrice()%></nobr>
+					</div>
+				<%} else {%>
+					<div id='empty'>Корзина пуста</div>
+				<%}%> 
 			</div>
 	</li> 
 </ul> 
@@ -332,20 +339,5 @@ catalog.remove(catalog.lastElement());
 						<tr>
 							 <td colspan="2"  style="width: 75%;vertical-align: top;text-align: center;">
 							 	<div id="loadBlock" style="vertical-align: top;">
-								 	<div align="center" id="multyPics">
+								 	<div align="center" id="test1">
 								 	</div><br/>
-<%
-commonBean.setPars(pars);
-%>								 	
-									<jsp:include page="Catalog.jsp"/>								 	
-							 	</div>
-					 			<br/>
-							 </td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-</div>
-</body>
-</html>

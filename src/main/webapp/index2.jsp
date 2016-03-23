@@ -13,11 +13,10 @@
     <script type="text/javascript" src="js/jquery-latest.min.js"></script> 
     <script type="text/javascript" src="js/jquery.cross-slide.js"></script> 
     <script type="text/javascript">
-    alert(0);
     $(document).ready(function(){
         $('#menu ul li').hover(function(){
         	$('#menu ul li').css('display','block');
-        })
+        });
         $("#poisk_text").keypress(function(e) {
         	if(e.keyCode==13) {
         		loadCatalog('poisk');
@@ -71,7 +70,7 @@
 	        		var level_parent = $("#level_parent").val();
 	        		var id_parent = $("#id_parent").val();
 		        	$.ajax({
-	      			  url: "Catalog.jsp",
+	      			  url: "Catalog2.jsp",
 	    			  data: {id  : id, level : 3, page : page, poisk : poisk, level_parent : level_parent, id_parent : id_parent},
 	    			  cache: false
 	    			}).done(function( html ) {
@@ -81,7 +80,7 @@
         		return false;
         	} else {
 	        	$.ajax({
-	        			  url: "Catalog.jsp",
+	        			  url: "Catalog2.jsp",
 	        			  data: {id  : id, level : level, page : page},
 	        			  cache: false
 	        			}).done(function( html ) {
@@ -108,14 +107,16 @@
         }
         
         function setLeftCatalog(name, id, id_tek, level) {
+//        	alert($("#"+name+id+" ul").html());
         	if($("#"+name+id+" ul").html()==null) {
         		$("#catalog #"+name+id).parent().find("a").removeAttr("class");
         		$("#catalog #"+name+id+" a").attr("class","ovalBorder5");
         		$("#catalog #"+name+id).append("<ul>");
+        		alert($("#menu_li_"+id+" li").html());
         		$("#menu_li_"+id+" li").each(function() {
 //        			alert($(this).attr("id"));
 					var str_id = $(this).attr('id');
-					var ahref = '<a href="#" onclick="loadCatalog('+str_id+', 2);" style="font-size : 12px;">';
+					var ahref = '<a href="level0.jsp?id='+str_id+'&amp;level=2" style="font-size : 12px;">';
         			$("#catalog #"+name+id+" ul").append("<li style='margin-left: -25px;list-style-type: disc;' id='FIRMA"+str_id+"''>"+ahref+$(this).text()+"</a></li>");
         		});
         	}
@@ -158,10 +159,12 @@ for(Enumeration params = request.getParameterNames(); params.hasMoreElements();)
 commonBean.setPars(null); 
 commonBean.setLevel();
 commonBean.setPage();
-HashMap<String, Vector<HashMap<String, String>>> result = commonBean.getResult();
-Vector<HashMap<String, String>> catalog = result.get("Request_0");
-HashMap <String, String> rows = (HashMap <String, String>) catalog.lastElement();
-catalog.remove(catalog.lastElement());
+String className = "ru.flooring_nn.sql.SQLsFlooring_nn";
+String methodName = "getRequests";
+HashMap<String, List<HashMap<String, String>>> result = commonBean.getResult(className, methodName);
+List<HashMap<String, String>> catalog = new ArrayList<HashMap<String, String>>(result.get("Request_0"));
+HashMap <String, String> rows = (HashMap <String, String>) catalog.get(catalog.size()-1);
+catalog.remove(catalog.get(catalog.size()-1));
 %>
  <link href="styles/style.css" rel='stylesheet' type='text/css'>
  </head>
@@ -171,13 +174,14 @@ catalog.remove(catalog.lastElement());
 <center>    
 <ul id="menu"> 
 	<li>
-			<a href="">Главная</a>
+			<a href="index2.jsp">Главная</a>
 	</li> 
 	<li> 
 		<a href="#">Каталог товаров</a> 
 		<ul> 
-		<%for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
-			HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement()); 
+		<%for(HashMap<String, String> row : catalog) {
+//			for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+//			HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement()); 
 			String section = row.get("SECTION");
 			String picture = row.get("PICTURE");
 			String id = row.get("ID");%>
@@ -262,13 +266,14 @@ catalog.remove(catalog.lastElement());
 						<tr>
 							<td>
 								<ul id="catalog">
-								<%for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
-									HashMap<String, String> row = (HashMap<String, String>) elements.nextElement();
+								<%for(HashMap<String, String> row : catalog) {
+//								for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+//									HashMap<String, String> row = (HashMap<String, String>) elements.nextElement();
 									String section = row.get("SECTION");
 									String id = row.get("ID");
 									%>
 									<li id='SECTION<%=id%>'> 
-										<a href="#" onclick="loadCatalog(<%=id%>, 1);">
+										<a href="level0.jsp?id=<%=id%>&amp;level=1">
 											<%=section%>
 										</a>
 									</li>						
@@ -337,7 +342,7 @@ catalog.remove(catalog.lastElement());
 <%
 commonBean.setPars(pars);
 %>								 	
-									<jsp:include page="Catalog.jsp"/>								 	
+									<jsp:include page="Catalog2.jsp"/>								 	
 							 	</div>
 					 			<br/>
 							 </td>

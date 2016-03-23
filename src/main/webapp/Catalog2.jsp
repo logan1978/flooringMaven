@@ -18,19 +18,42 @@ commonBean.setLevel();
 commonBean.setPage();
 int level = commonBean.getLevel();
 int page_ = commonBean.getPage();
-String id_parrent = commonBean.getPars().get("id");
+String id_parent = commonBean.getPars().get("id");
 String [] names = {"SECTION", "FIRMA", "COLLECTION", "DECOR","DECOR"};
+String className = "ru.flooring_nn.sql.SQLsFlooring_nn";
+String methodName = "getRequests";
 //Vector<HashMap<String, String>> catalog = commonBean.getResult();
-HashMap<String, Vector<HashMap<String, String>>> result = commonBean.getResult();
-Vector<HashMap<String, String>> catalog = result.get("Request_0");
-Vector<HashMap<String, String>> catalog_pred = result.get("Request_1");
-HashMap <String, String> rows = (HashMap <String, String>) catalog.lastElement();
+HashMap<String, List<HashMap<String, String>>> result = commonBean.getResult(className, methodName);
+List<HashMap<String, String>> catalog = result.get("Request_0");
+List<HashMap<String, String>> catalog_pred = result.get("Request_1");
+HashMap <String, String> rows = (HashMap <String, String>) catalog.get(catalog.size()-1);
 int countRows = Integer.parseInt(rows.get("ROWS"));
 int pages = (int) Math.ceil(countRows / (commonBean.getPageSize()*1.0));
-catalog.remove(catalog.lastElement());
+catalog.remove(catalog.get(catalog.size()-1));
 if(level > 0) {
-String id_cat_parent = names[level-1]+id_parrent;
+String id_cat_parent = names[level-1]+id_parent;
+if(level>=2) {
+List<HashMap<String, String>> catalog_left_pred = result.get("Request_2");
+catalog_left_pred.remove(catalog_left_pred.get(catalog_left_pred.size()-1));
 %>
+<script type="text/javascript">
+<%for(HashMap<String,String> row : catalog_left_pred) {
+	String section = row.get("FIRMA");
+	String str_id = row.get("ID");
+	String id = row.get("ID_SEC");
+%>
+var str_id = '<%=str_id%>';
+var id = '<%=id%>';
+var section = '<%=section%>';
+var ahref = '<a href="level0.jsp?id='+str_id+'&amp;level=2" style="font-size : 12px;">';
+if($("#catalog #SECTION"+id+" ul").length==0) {
+	$("#catalog #SECTION"+id).append("<ul></ul>");
+}
+$("#catalog #SECTION"+id+" ul").append("<li style='margin-left: -25px;list-style-type: disc;' id='FIRMA"+str_id+"''>"+ahref+section+"</a></li>");
+
+<%}%>
+</script>
+<%}%>
 <script type="text/javascript">
 var id_cat = '<%=id_cat_parent%>';
 //$("#"+id_cat).parent().parent().find("a").css("font-weight","normal");
@@ -58,11 +81,15 @@ $("#catalog").find("a").removeAttr("class");
 				 			<h3>
 <%
 if(catalog_pred!=null) {
-String [] sect = {catalog_pred.firstElement().get(names[0]), catalog_pred.firstElement().get("ID_"+names[0])};
-String [] firm = {catalog_pred.firstElement().get(names[1]), catalog_pred.firstElement().get("ID_"+names[1])};
-String [] coll = {catalog_pred.firstElement().get(names[2]), catalog_pred.firstElement().get("ID_"+names[2])};
-String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstElement().get("ID_"+names[3])};
-%>
+String [] sect = {catalog_pred.get(0).get(names[0]), catalog_pred.get(0).get("ID_"+names[0])};
+String [] firm = {catalog_pred.get(0).get(names[1]), catalog_pred.get(0).get("ID_"+names[1])};
+String [] coll = {catalog_pred.get(0).get(names[2]), catalog_pred.get(0).get("ID_"+names[2])};
+String [] dec = {catalog_pred.get(0).get(names[3]), catalog_pred.get(0).get("ID_"+names[3])};
+if(level==2) {%>
+<script type="text/javascript">
+setLeftCatalog('<%=names[0]%>',<%=sect[1]%>, <%=firm[1]%>, <%=level%>)
+</script>
+<%}%>
 								<nobr>				 			
 					 				<a href="" onclick="loadCatalog(0, 0);">Каталог товаров</a>
 					 				<span>
@@ -98,16 +125,21 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 						<%	if(level <4) {
 								int colsCatalog = 4; //количество столбцов каталоге
 								int percentWidth = 100/colsCatalog;
-								for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {%>
+//								for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+								for(int k=0; k<catalog.size(); k+=4) {
+//								for(HashMap<String, String> row : catalog) {
+								%>
 									<tr>
-							<%		for(int i=0; i<colsCatalog && elements.hasMoreElements(); i++) {
-										HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement());
+							<% 		for(int i=0; i<colsCatalog; i++) {		
+//								for(int i=0; i<colsCatalog && elements.hasMoreElements(); i++) {
+//										HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement());
+										HashMap <String, String> row = catalog.get(i+k);
 										String nameColumn = names[level];
 										String section = row.get(nameColumn);
 										String picture = row.get("PICTURE");
 										String id = row.get("ID");%>
 										<td style='width : <%=percentWidth%>%'>
-					 					<a onclick="loadCatalog(<%=id%>, <%=level+1%>);">
+					 					<a href="level0.jsp?id=<%=id%>&amp;level=<%=level+1%>">
 					 						<div>
 					 							<img alt="<%=section%>" title="<%=section%>" src="<%=picture%>">
 					 							<br/><%=section%>
@@ -120,11 +152,12 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 	var id = "<%=id_cat%>";
 	var section = '<%=section%>';
 	//var countRows = <%=countRows%>;
-	var ahref = '<a href="#" onclick="loadCatalog(<%=id%>, <%=level+1%>);" style="font-size : <%=13-level%>px;">';
+	var ahref = '<a href="level0.jsp?id=<%=id%>&amp;level=<%=level+1%>" style="font-size : <%=13-level%>px;">';
 	$("#"+id_cat+" ul").append("<li style='margin-left: -25px;list-style-type: disc;' id="+id+">"+ahref+section+" </a></li>");
 	</script>
 	<%} 
-					 					 if(!elements.hasMoreElements()) {
+ 
+										if(catalog.indexOf(row) == (catalog.size()-1)) {
 					 						for(int j=i+1; j<colsCatalog; j++) {%>
 										<td style='width : <%=percentWidth%>%'>
 					 						<div>
@@ -133,14 +166,19 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 					 					</td>
 					 							
 					 						<%}
+					 						break; 
 					 					} 
+										row = catalog.get(catalog.indexOf(row)+1);
 									}%>
 									</tr>
 									
-						<%		}
+						<%		
+
+								}
 							} else {
-								for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
-									HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement());
+								//for(Enumeration elements = catalog.elements();elements.hasMoreElements();) {
+									//HashMap <String, String> row = ((HashMap<String, String>) elements.nextElement());
+								for(HashMap<String, String> row : catalog) {
 									String nameColumn = names[level];
 									String section = row.get(nameColumn);
 									String picture = row.get("PICTURE");
@@ -196,7 +234,7 @@ String [] dec = {catalog_pred.firstElement().get(names[3]), catalog_pred.firstEl
 			 						if("poisk".equals(id)) {%>
 			 				&nbsp;<a href="" onclick="loadCatalog('<%=id%>',3,<%=i%>);"><%=i%></a>&nbsp;
 			 						<%} else { %>
-			 				&nbsp;<a href="" onclick="loadCatalog(<%=id_parrent%>, <%=level%>, <%=i%>);"><%=i%></a>&nbsp;
+			 				&nbsp;<a href="" onclick="loadCatalog(<%=id_parent%>, <%=level%>, <%=i%>);"><%=i%></a>&nbsp;
 			 			<%			}
 			 					} else {%>
 			 						<span>&nbsp;<%=i%>&nbsp;</span>
