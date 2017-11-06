@@ -21,6 +21,7 @@ int page_ = commonBean.getPage();
 String id_parrent = commonBean.getPars().get("id");
 String [] names = {"SECTION", "FIRMA", "COLLECTION", "DECOR","DECOR"};
 //Vector<HashMap<String, String>> catalog = commonBean.getResult();
+//krasky
 HashMap<String, Vector<HashMap<String, String>>> result = commonBean.getResult();
 Vector<HashMap<String, String>> catalog = result.get("Request_0");
 Vector<HashMap<String, String>> catalog_pred = result.get("Request_1");
